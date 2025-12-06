@@ -14,6 +14,7 @@ pip install baostock pandas numpy matplotlib
 
 ### 2. 配置回测时间（重要）
 在 `data_gen.py` 文件中配置回测时间
+格式："2025-12-07"
 
 ### 3. 生成数据
 运行数据生成脚本：`exp/data_gen.py`
