@@ -19,6 +19,9 @@ N_GROUPS = 5
 CURRENT_DIR = Path(__file__).parent
 PROJECT_ROOT = CURRENT_DIR.parent
 
+START_DATE = ""
+END_DATE = ""
+
 DATA_PATHS = {
     '沪深300': PROJECT_ROOT / 'data' / 'hs300_stocks_2024.csv',
     '中证500': PROJECT_ROOT / 'data' / 'zz500_stocks_2024.csv',
@@ -618,9 +621,9 @@ class Visualizer:
         self.save(fig, 'ic_analysis')
 
 # ==================== 文字小结 ====================
-def write_text_summary(pool, bt, factor, out_dir):
+def write_text_summary(pool, bt, factor, out_dir, sd, ed):
     lines = [f"# {pool} {factor} 因子回测报告", "="*50, ""]
-    lines += [f"- 回测周期: 2024-01-01 至 2024-12-31",
+    lines += [f"- 回测周期: {sd} 至 {ed}",
               f"- 因子名称: {factor}",
               f"- 分组数量: {N_GROUPS}",
               f"- 回测天数: {len(bt.group_returns) if hasattr(bt, 'group_returns') else 0}",
@@ -645,7 +648,7 @@ def write_text_summary(pool, bt, factor, out_dir):
     (Path(out_dir) / f"{pool}_summary_report.txt").write_text('\n'.join(lines), encoding='utf-8')
 
 # ==================== 主流程 ====================
-def run_factor(factor_name, factor_func):
+def run_factor(factor_name, factor_func, sd, ed):
     print(f"\n{'='*60}")
     print(f">>> 开始因子 {factor_name}")
     print(f"{'='*60}")
@@ -657,7 +660,7 @@ def run_factor(factor_name, factor_func):
         bt = FactorBacktest(df_with_factor, factor_name).run_backtest()
         if hasattr(bt, 'group_returns') and len(bt.group_returns) > 0:
             Visualizer(bt, pool, out_dir).plot_all()
-            write_text_summary(pool, bt, factor_name, out_dir)
+            write_text_summary(pool, bt, factor_name, out_dir, sd, ed)
         else:
             print(f"   ⚠️  {pool} 无有效回测数据")
     print(f"✅ {factor_name} 完成！")
@@ -673,7 +676,7 @@ def main():
     target_factors = list(FACTORS.keys())
     
     for name in target_factors:
-        run_factor(name, FACTORS[name])
+        run_factor(name, FACTORS[name],START_DATE, END_DATE)
     
     print("\n" + "="*60)
     print("✅ 所有因子完成！")
